@@ -119,7 +119,7 @@ class Analysis:
     def calculate_score(self, data, data_lot, corr_wf, corr_lot, corr_wlot):
         case_para = 'None'
         
-        pval_lot = corr_lot['pval']
+        pval_lot = corr_lot['pval']e
         slope_lot = corr_lot['slope']
         r2_lot = corr_lot['r2']
 
@@ -165,7 +165,6 @@ class Analysis:
             apval_wlot = min(1, pval_wlot / pval_thres)
             awratio = min(2 / 3, max(1 / 3, wratio))
             sig_score = 1 - (apval_lot * (1 - awratio) + apval_wlot * awratio)
-            orig_score = 1 - max(pval_lot, pval_wlot)
             
         else:
             sig_score = 0
@@ -173,11 +172,12 @@ class Analysis:
             apval_wlot = min(1, pval_wlot / 0.1)
 
             if wratio < 0.2:
-                apval_lot = min(1, (1 - apval_lot) * 2 * r2_lot)
-            if wratio > 0.8:
-                sig_score = min(1, (1 - apval_wlot) * 5 * r2_lot)
-            if pval_lot < 0.02 or pval_wlot < 0.02:
-                orig_score = 1 - max(pval_lot, pval_wlot)
+                sig_score = min(1, (1 - apval_lot) * 2 * r2_lot)
+            elif wratio > 0.8:
+                sig_score = min(1, (1 - apval_wlot) * 5 * r2_wlot)
+            
+            if pval_lot < 0.02 and pval_wlot < 0.02:
+                sig_score = max(sig_score, 1 - max(pval_lot, pval_wlot))
 
         res = {
             "parameter": self.feature,
